@@ -1,0 +1,8 @@
+<testsuites id="" name="" tests="2" failures="0" skipped="0" errors="0" time="1.847649000000005">
+<testsuite name="api\auth-api.spec.ts" timestamp="2026-11-13T16:50:44.373Z" hostname="chromium" tests="2" failures="0" skipped="0" time="1.018" errors="0">
+<testcase name="Auth API Tests › POST - Successful Login @master @sanity @api" classname="api\auth-api.spec.ts" time="0.496">
+</testcase>
+<testcase name="Auth API Tests › POST - Invalid Login @master @regression @api" classname="api\auth-api.spec.ts" time="0.522">
+</testcase>
+</testsuite>
+</testsuites>
