@@ -70,6 +70,9 @@ jobs:
           # No --reporter flag: it would replace the config reporters and leave the report folders empty
           $pwArgs = @('playwright', 'test', '--grep', "@$tag", "--project=$browser", '--output=test-results')
           if ($mode -eq 'headed') { $pwArgs += '--headed' }
+          # Skip tests GitHub-hosted runners cannot reach: FakeStore blocks their IPs (403) and
+          # the DB test needs the local OpenCart admin + MySQL. Choosing test:api still runs API tests.
+          if ($tag -ne 'api') { $pwArgs += @('--grep-invert', '@api|@db') }
           npx @pwArgs
         env:
           CI: "1"
