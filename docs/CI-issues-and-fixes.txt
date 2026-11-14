@@ -1,0 +1,107 @@
+PLAYWRIGHT PROJECT - GITHUB ACTIONS CI: ISSUES AND FIXES
+Repository: gk81blr/playwright_project   Date: 2026-11-14
+Final result: CI green (web tests on awesomeqa.com). API + DB tests run locally.
+
+======================================================================
+ISSUES (in the order they were hit)
+======================================================================
+
+1. headless: false in playwright.config.ts
+   Symptom : Every browser test failed - GitHub runner has no display.
+   Fix     : headless: !!process.env.CI  (headed locally, headless on CI)
+
+2. Web and DB tests pointed at localhost (OpenCart + MySQL on own PC)
+   Symptom : Timeouts - a GitHub runner cannot reach your PC's localhost.
+   Fix     : Web tests moved to https://awesomeqa.com/ui/ (WEB_APP_URL).
+             DB test is skipped on CI (needs local admin + MySQL).
+
+3. No API login on CI (.env is gitignored, correctly)
+   Symptom : "POST - Successful Login" returned 400.
+   Fix     : API_USERNAME / API_PASSWORD added as repository secrets
+             (Settings > Secrets and variables > Actions) and passed to the
+             test step via env: ${{ secrets.API_USERNAME }} etc.
+   Note    : Each secret = ONE name + ONE value. No "KEY=" prefix, no quotes.
+
+4. Wrong artifact path
+   Symptom : "No files were found with the provided path: playwright-report/"
+   Fix     : Upload reports/, custom-report/, allure-results/
+             (the HTML reporter writes to reports/, not playwright-report/).
+
+5. package.json was invalid JSON
+   Symptom : npm ci failed in 12s - EJSONPARSE (line 28 column 1).
+   Cause   : A "scripts" block was pasted AFTER the closing }.
+   Fix     : Scripts moved inside the existing "scripts": { } block.
+
+6. Wrong grep tags in npm scripts
+   Symptom : "No tests found".
+   Cause   : test:e2e used @e2e (tests are tagged @end-to-end);
+             test:master:headed grepped @sanity.
+   Fix     : test:e2e -> --grep @end-to-end ; test:master:headed -> --grep @master
+
+7. Workflow triggered on branch "master", repo branch is "main"
+   Symptom : Pushes did not start CI.
+   Fix     : branches: [main]
+
+8. Workflow offered firefox / webkit browsers
+   Symptom : "Project(s) firefox not found" - only chromium is defined
+             in playwright.config.ts.
+   Fix     : Browser choice limited to chromium.
+
+9. --reporter=dot in the workflow test command
+   Symptom : Report folders empty - a CLI --reporter replaces ALL reporters
+             configured in playwright.config.ts.
+   Fix     : Flag removed; config reporters (html, junit, custom, allure) used.
+
+10. fakestoreapi.com blocks GitHub runner IPs
+   Symptom : All API tests failed in ~60-130ms with "Received: 403".
+             Same tests pass 36/36 from a home PC.
+   Fix     : Workflow adds --grep-invert "@api|@db" on GitHub-hosted runner.
+             API tests run locally (npm run test:api) or on a self-hosted runner.
+
+11. Page objects written for OpenCart 4.1, awesomeqa.com runs OpenCart 3
+   Symptom : All 13 web tests failed on awesomeqa
+             (e.g. waiting for #top button "My Account").
+   Fix     : Page objects now support both versions:
+             - My Account: button (OC4) or link (OC3)
+             - Search button: #search button (OC3) / header form submit (OC4)
+             - Register: id-based fields; Telephone + Password Confirm
+               filled when present (OC3 requires them)
+             - Login button inside #content form; alerts .alert-danger/.alert-success
+             - My Account heading h1 (OC4) / h2 (OC3)
+             - Search results .product-thumb (no #product-list in OC3)
+             - Cart: quantity[...] inputs, extra Model column, "Total:" label
+
+12. Real secrets copied into .env.example (public repo)
+   Symptom : PLTEST token, admin login and API login would be published.
+   Fix     : Values blanked before pushing. .env.example = template only;
+             real values live in .env (local) and GitHub secrets (CI).
+
+======================================================================
+NOT REAL ISSUES (looked suspicious, were fine)
+======================================================================
+- "injected env (0) from .env": normal. dotenv.config() is called in several
+  files; later calls find the values already loaded and report 0 new.
+  Proof: the DB test registered on awesomeqa, so WEB_APP_URL was loaded.
+- Node.js 20 / ubuntu-latest notices: warnings only, never caused a failure.
+
+======================================================================
+STILL OPEN
+======================================================================
+- API + DB tests only run locally (or later on a self-hosted runner;
+  remove the pull_request trigger first - the repo is public).
+- Generated reports (allure-results/, custom-report/, reports/) are committed;
+  add them to .gitignore and git rm -r --cached them.
+- xlsx@0.18.5 has a high-severity vulnerability (npm audit).
+- Shared awesomeqa account pavanol@xyz.com can be locked for 1 hour after
+  5 failed logins (by anyone on that public site).
+- Local XAMPP sometimes stalls under parallel load (30s timeouts on random
+  tests); not a locator problem.
+
+======================================================================
+HOW TO RUN
+======================================================================
+CI (GitHub)    : push to main, or Actions > Playwright Tests > Run workflow
+Local all      : npx playwright test
+Local API only : npm run test:api
+Local DB test  : npx playwright test tests/db
+Type check     : npx tsc --noEmit -p .

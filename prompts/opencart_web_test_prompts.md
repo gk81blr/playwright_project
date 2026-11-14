@@ -1,6 +1,11 @@
 # OpenCart Frontend Store – Web Test Scenarios
 
-**Application URL:** `http://localhost/opencart/upload/`
+**Application URL:** read from `WEB_APP_URL` in `.env` — never hard-code it in tests or page objects.
+
+- CI (GitHub-hosted runner): `https://awesomeqa.com/ui/` (OpenCart 3.x, public — reachable from CI)
+- Local: `http://localhost/opencart/upload/` (OpenCart 4.x — NOT reachable from GitHub-hosted runners)
+
+Page objects must work on both OpenCart 3.x and 4.x. Verify locators on the target store with Playwright CLI/MCP; the markup differs between versions (e.g. "My Account" is a button in 4.x and a link in 3.x).
 
 Implement these scenarios following the framework conventions defined in `playwright-mcp-context.md`.
 
@@ -18,9 +23,9 @@ Validate successful customer registration in the OpenCart frontend.
    - First Name
    - Last Name
    - Email Address
-   - Telephone
+   - Telephone (only when the form has this field — OpenCart 3.x requires it, 4.x has none)
    - Password
-   - Password Confirmation
+   - Password Confirmation (only when the form has this field — OpenCart 3.x)
 6. Accept the Privacy Policy.
 7. Submit the registration form.
 8. Verify that registration succeeds.
@@ -184,7 +189,7 @@ Do not hard-code test data in the spec.
 
 For each data row:
 
-1. Open the OpenCart login page: `http://localhost/opencart/upload/`.
+1. Open the application (`WEB_APP_URL`) and navigate to **My Account → Login**.
 2. Enter the email and password.
 3. If a value is blank/whitespace, leave that field empty.
 4. Submit the login form.

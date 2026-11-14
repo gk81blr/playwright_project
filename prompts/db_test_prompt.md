@@ -12,6 +12,10 @@ Validate a newly registered OpenCart customer across three layers:
 
 The test must use dynamically generated customer data so that every execution creates a unique customer.
 
+**Run location:** this test needs the local OpenCart frontend, admin portal and MySQL, so it runs locally only (or on a self-hosted runner). Tag it `@db`; the CI workflow skips `@db` on GitHub-hosted runners because they cannot reach `localhost`.
+
+All connection details below come from `.env` (`WEB_APP_URL`, `ADMIN_APP_URL`, `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `DB_*`). Real credentials go in `.env` (gitignored) or GitHub secrets — never in `.env.example`, which is committed.
+
 ## Application Details
 
 ### Frontend
@@ -27,7 +31,7 @@ The test must use dynamically generated customer data so that every execution cr
 
 - Host: `localhost`
 - Port: `3306`
-- Database: `openshop`
+- Database: `sqldb` (verify with `SHOW DATABASES` / the OpenCart `config.php`; `openshop` does not exist on this install)
 - Username: `root`
 - Password: empty
 - Table: `oc_customer`
@@ -45,9 +49,11 @@ One independent end-to-end test with the following flow.
    - First Name
    - Last Name
    - Unique Email Address
-   - Telephone
+   - Telephone (only when the form has this field — OpenCart 3.x)
    - Password
-   - Password Confirmation
+   - Password Confirmation (only when the form has this field — OpenCart 3.x)
+
+   Use letters only for first and last names: OpenCart stores characters such as `'` as HTML entities (`&#039;`) in the database, which breaks the DB comparison.
 5. Fill all mandatory registration fields.
 6. Accept the Privacy Policy.
 7. Submit the registration form.
@@ -60,7 +66,7 @@ One independent end-to-end test with the following flow.
 1. Open the OpenCart Admin Portal.
 2. Log in using configured administrator credentials.
 3. Navigate to the **Customers** section.
-4. Search for the customer using the unique email address.
+4. Search for the customer using the unique email address. The filter reloads the list with AJAX — wait for the filtered list before counting rows.
 5. Verify that the customer exists.
 6. Open the customer record/details when applicable.
 7. Verify:

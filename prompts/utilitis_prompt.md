@@ -207,7 +207,7 @@ The function must:
 3. Convert `DB_PORT` to a number when it is available. If it is not available, use `undefined`.
 4. Execute the SQL statement using `connection.execute(sql, params)`.
 5. Store the returned result.
-6. Close the database connection using `await connection.end()`.
+6. Close the database connection using `await connection.end()` inside a `finally` block, so it closes even when the query throws.
 7. Return the query result.
 
 Use a single database connection for each `executeQuery()` call.
