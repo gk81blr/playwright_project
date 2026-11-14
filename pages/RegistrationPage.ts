@@ -9,7 +9,9 @@ export class RegistrationPage {
     private readonly txtFirstName: Locator;
     private readonly txtLastName: Locator;
     private readonly txtEmail: Locator;
+    private readonly txtTelephone: Locator;
     private readonly txtPassword: Locator;
+    private readonly txtPasswordConfirm: Locator;
     private readonly chkPrivacyPolicy: Locator;
     private readonly btnContinue: Locator;
     private readonly headingConfirmation: Locator;
@@ -20,12 +22,16 @@ export class RegistrationPage {
 
         // Initialize locators with CSS selectors
         this.headingRegister = page.getByRole('heading', { name: 'Register Account' });
-        this.txtFirstName = page.getByRole('textbox', { name: 'First Name' });
-        this.txtLastName = page.getByRole('textbox', { name: 'Last Name' });
-        this.txtEmail = page.getByRole('textbox', { name: 'E-Mail' });
-        this.txtPassword = page.getByRole('textbox', { name: 'Password' });
+        // Field ids are the same in OpenCart 3 and 4
+        this.txtFirstName = page.locator('#input-firstname');
+        this.txtLastName = page.locator('#input-lastname');
+        this.txtEmail = page.locator('#input-email');
+        // Telephone and Password Confirm exist only in OpenCart 3
+        this.txtTelephone = page.locator('#input-telephone');
+        this.txtPassword = page.locator('#input-password');
+        this.txtPasswordConfirm = page.locator('#input-confirm');
         this.chkPrivacyPolicy = page.locator('input[name="agree"]');
-        this.btnContinue = page.locator('#form-register').getByRole('button', { name: 'Continue' });
+        this.btnContinue = page.locator('#content form').getByRole('button', { name: 'Continue' });
         this.headingConfirmation = page.locator('#content h1');
         this.lnkContinueAfterRegistration = page.locator('#content').getByRole('link', { name: 'Continue' });
     }
@@ -69,11 +75,24 @@ export class RegistrationPage {
     }
 
     /**
-     * Enters the password
+     * Enters the telephone when the form has a Telephone field (OpenCart 3)
+     * @param telephone - Telephone number
+     */
+    async setTelephone(telephone: string): Promise<void> {
+        if (await this.txtTelephone.count() > 0) {
+            await this.txtTelephone.fill(telephone);
+        }
+    }
+
+    /**
+     * Enters the password, and the confirmation when the form has a Password Confirm field (OpenCart 3)
      * @param password - Password
      */
     async setPassword(password: string): Promise<void> {
         await this.txtPassword.fill(password);
+        if (await this.txtPasswordConfirm.count() > 0) {
+            await this.txtPasswordConfirm.fill(password);
+        }
     }
 
     /**
@@ -92,13 +111,14 @@ export class RegistrationPage {
 
     /**
      * Fills and submits the complete registration form
-     * @param userData - First name, last name, email and password of the new customer
+     * @param userData - First name, last name, email, telephone and password of the new customer
      */
-    async completeRegistration(userData: { firstName: string; lastName: string; email: string; password: string }): Promise<void> {
+    async completeRegistration(userData: { firstName: string; lastName: string; email: string; telephone: string; password: string }): Promise<void> {
         try {
             await this.setFirstName(userData.firstName);
             await this.setLastName(userData.lastName);
             await this.setEmail(userData.email);
+            await this.setTelephone(userData.telephone);
             await this.setPassword(userData.password);
             await this.setPrivacyPolicy();
             await this.clickContinue();

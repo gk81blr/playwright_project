@@ -46,6 +46,7 @@ test('Customer registration verified in UI, Admin and DB @master @end-to-end @db
         firstName: RandomDataUtil.getFirstName().replace(/[^A-Za-z]/g, ''),
         lastName: RandomDataUtil.getLastName().replace(/[^A-Za-z]/g, ''),
         email: `${Date.now()}_${RandomDataUtil.getEmail()}`.toLowerCase(),
+        telephone: RandomDataUtil.getPhoneNumber(),
         password: RandomDataUtil.getPassword(),
     };
 

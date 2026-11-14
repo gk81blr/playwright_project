@@ -16,7 +16,7 @@ export class ProductPage {
         this.headingProductName = page.locator('#content h1');
         this.txtQuantity = page.locator('#input-quantity');
         this.btnAddToCart = page.locator('#button-cart');
-        this.msgSuccess = page.locator('#alert .alert-success');
+        this.msgSuccess = page.locator('.alert-success').first();
     }
 
     /**

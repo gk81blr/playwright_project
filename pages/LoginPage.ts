@@ -18,8 +18,8 @@ export class LoginPage {
         this.headingReturningCustomer = page.getByRole('heading', { name: 'Returning Customer' });
         this.txtEmail = page.getByLabel('E-Mail Address');
         this.txtPassword = page.getByLabel('Password');
-        this.btnLogin = page.locator('#form-login').getByRole('button', { name: 'Login' });
-        this.msgAlert = page.locator('#alert .alert');
+        this.btnLogin = page.locator('#content form').getByRole('button', { name: 'Login' });
+        this.msgAlert = page.locator('.alert-danger').first();
     }
 
     /**

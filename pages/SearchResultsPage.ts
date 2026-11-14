@@ -13,7 +13,7 @@ export class SearchResultsPage {
 
         // Initialize locators with CSS selectors
         this.headingSearch = page.locator('#content h1');
-        this.lnkProductNames = page.locator('#product-list h4 a');
+        this.lnkProductNames = page.locator('#content .product-thumb h4 a');
     }
 
     /**
@@ -65,6 +65,6 @@ export class SearchResultsPage {
     }
 
     private productLink(productName: string): Locator {
-        return this.page.locator('#product-list').getByRole('heading', { name: productName, exact: true }).getByRole('link');
+        return this.page.locator('#content .product-thumb').getByRole('heading', { name: productName, exact: true }).getByRole('link');
     }
 }

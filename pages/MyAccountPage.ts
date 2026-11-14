@@ -12,7 +12,8 @@ export class MyAccountPage {
         this.page = page;
 
         // Initialize locators with CSS selectors
-        this.headingMyAccount = page.getByRole('heading', { name: 'My Account', level: 1 });
+        // h1 in OpenCart 4, h2 in OpenCart 3
+        this.headingMyAccount = page.locator('#content').getByRole('heading', { name: 'My Account', exact: true });
         this.lnkLogout = page.getByRole('complementary').getByRole('link', { name: 'Logout' });
     }
 

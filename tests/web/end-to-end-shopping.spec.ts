@@ -27,6 +27,7 @@ test('End-to-end shopping test @master @end-to-end @web', async ({
         firstName: RandomDataUtil.getFirstName(),
         lastName: RandomDataUtil.getLastName(),
         email: RandomDataUtil.getEmail(),
+        telephone: RandomDataUtil.getPhoneNumber(),
         password: RandomDataUtil.getPassword(),
     };
     const { productName, productQuantity, totalPrice } = Helper.getProductDetails();

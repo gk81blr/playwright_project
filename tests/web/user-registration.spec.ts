@@ -20,6 +20,7 @@ test('User registration test @master @sanity @regression @web', async ({ homePag
         firstName: RandomDataUtil.getFirstName(),
         lastName: RandomDataUtil.getLastName(),
         email: RandomDataUtil.getEmail(),
+        telephone: RandomDataUtil.getPhoneNumber(),
         password: RandomDataUtil.getPassword(),
     };
 

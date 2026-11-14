@@ -13,8 +13,9 @@ export class ShoppingCartPage {
 
         // Initialize locators with CSS selectors
         this.headingShoppingCart = page.getByRole('heading', { name: /^Shopping Cart/, level: 1 });
-        this.rowsCartProducts = page.locator('#shopping-cart tbody tr');
-        this.rowCartTotal = page.locator('#checkout-total tr').filter({ has: page.locator('strong', { hasText: /^Total$/ }) });
+        this.rowsCartProducts = page.locator('#content table tbody tr');
+        // "Total" in OpenCart 4, "Total:" in OpenCart 3
+        this.rowCartTotal = page.locator('#content table tr').filter({ has: page.locator('strong', { hasText: /^Total:?$/ }) });
     }
 
     /**
@@ -52,7 +53,8 @@ export class ShoppingCartPage {
      * @returns Promise<string> - Quantity value
      */
     async getProductQuantity(productName: string): Promise<string> {
-        return await this.productRow(productName).locator('input[name="quantity"]').inputValue();
+        // name="quantity" in OpenCart 4, name="quantity[<cart id>]" in OpenCart 3
+        return await this.productRow(productName).locator('input[name^="quantity"]').inputValue();
     }
 
     /**
@@ -61,7 +63,10 @@ export class ShoppingCartPage {
      * @returns Promise<string> - Unit price text, e.g. "$602.00"
      */
     async getUnitPrice(productName: string): Promise<string> {
-        return ((await this.productRow(productName).getByRole('cell').nth(3).textContent()) ?? '').trim();
+        // Unit Price is the second-to-last column (OpenCart 3 has an extra Model column)
+        const cells = this.productRow(productName).locator('td');
+        const cellCount = await cells.count();
+        return ((await cells.nth(cellCount - 2).textContent()) ?? '').trim();
     }
 
     /**

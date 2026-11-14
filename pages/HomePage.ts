@@ -23,13 +23,17 @@ export class HomePage {
 
         // Initialize locators with CSS selectors
         this.lnkFeaturedHeading = page.getByRole('heading', { name: 'Featured' });
-        this.btnMyAccount = page.locator('#top').getByRole('button', { name: 'My Account' });
+        // OpenCart 4 uses a "My Account" button, OpenCart 3 a "My Account" link
+        this.btnMyAccount = page.locator('#top').getByRole('button', { name: 'My Account' })
+            .or(page.locator('#top').getByRole('link', { name: /My Account/ })).first();
         this.lnkRegister = page.locator('#top').getByRole('link', { name: 'Register' });
         this.lnkLogin = page.locator('#top').getByRole('link', { name: 'Login' });
         this.lnkLogout = page.locator('#top').getByRole('link', { name: 'Logout' });
         this.lnkShoppingCart = page.locator('#top').getByRole('link', { name: 'Shopping Cart' });
         this.txtSearch = page.getByRole('banner').getByPlaceholder('Search');
-        this.btnSearch = page.getByRole('banner').locator('form button[type="submit"]');
+        // OpenCart 3: button inside #search; OpenCart 4: submit button of the header search form
+        this.btnSearch = page.locator('#search button')
+            .or(page.getByRole('banner').locator('form button[type="submit"]'));
     }
 
     /**
